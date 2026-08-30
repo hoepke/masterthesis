@@ -1,0 +1,15 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# environments
+.venv/
+env/
+
+# data / outputs (not meant to be versioned)
+data/
+results/

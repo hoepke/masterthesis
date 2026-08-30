@@ -150,3 +150,9 @@ All outputs for a given run land under `<out_dir>/<preset>/`, e.g.
 (via `base_dir` / `results_dir` arguments) and writes the final thesis
 figures to whatever `out_dir` / `plot_path` you pass in its example calls
 (e.g. a separate `Plotting/` folder).
+
+## Generating the final figures (`create_plots.ipynb`)
+
+Once `analysis.py` has finished for the presets you want to compare, run
+`create_plots.ipynb` (`conda activate ghasp && jupyter lab`) to build the
+final thesis figures from the `results/<region>/<preset>/...` outputs.
