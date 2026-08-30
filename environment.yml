@@ -1,0 +1,29 @@
+name: ghasp
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - numpy
+  - pandas
+  - xarray
+  - dask
+  - netcdf4
+  - h5netcdf
+  - matplotlib
+  - scipy
+  - scikit-learn
+  - geopandas
+  - shapely
+  - rioxarray
+  - rasterio
+  - networkx
+  - joblib
+  - kneed
+  - pymannkendall
+  - cmcrameri
+  - jupyterlab
+  - ipykernel
+  - kneed
+  - pip
+  - pip:
+      - pytest
