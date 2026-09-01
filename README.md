@@ -8,13 +8,13 @@ analyzing their recurrence dynamics via Recurrence Quantification Analysis
 - **GHA** – Greater Horn of Africa (ERA5 `tp`, NetCDF, natively in metres)
 
 Each region is analyzed for two seasons via presets: `JJAS_full` (Kiremt /
-boreal summer) and `OND_full` (short rains).
+boreal summer) and `OND_full` (short rains / boreal autumn).
 
 ## Data
 
 The input rainfall data is **not** included in this repository and must be
 downloaded separately from the HU-Box (UP.box) share. The link and password
-are given in the thesis document (MA) itself.
+are given in the thesis document itself.
 
 After downloading, place the files so the paths below (from `submit.sh` /
 `submit_EA.sh`) resolve correctly, e.g.:
@@ -41,17 +41,17 @@ conda activate ghasp
 
 ## Repository layout
 
-| File | Purpose |
-|---|---|
-| `analysis.py` | Command-line entry point. Runs the full pipeline (prepare → cluster → RQA → plots) for one or several presets. |
-| `summarized_func.py` | Data preparation (`prepare`, `heatmap_periods`), clustering (`run_k_analysis`, `smooth_cluster`), and RQA orchestration (`rqa_full`) for one preset. |
-| `community.py` | Community-detection pipeline: PCA/spectral filtering, sliding-window heatmap, agglomerative clustering (k via Kneedle on the q-statistic), and mask post-processing (smoothing, splitting, merging) into final communities. |
-| `rqa.py` | Recurrence Quantification Analysis on rainfall time series: recurrence plots, RQA metrics (DET, LAM, ENTR, L_mean), Theiler-window estimation, rolling-window RQA with IAAFT surrogate significance testing, and Mann-Kendall trend export to CSV. |
-| `plots_and_stats.py` | Plotting and export utilities: styling helpers, community export to shapefile, cluster/heatmap plots, and RQA/rain diagnostic plots. |
+| File                 | Purpose                                                                                                                                                                                                                                                                                        |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `analysis.py`        | Command-line entry point. Runs the full pipeline (prepare → cluster → RQA → plots) for one or several presets.                                                                                                                                                                                 |
+| `summarized_func.py` | Data preparation (`prepare`, `heatmap_periods`), clustering (`run_k_analysis`, `smooth_cluster`), and RQA orchestration (`rqa_full`) for one preset.                                                                                                                                           |
+| `community.py`       | Community-detection pipeline: PCA/spectral filtering, sliding-window heatmap, agglomerative clustering (k via Kneedle on the q-statistic), and mask post-processing (smoothing, splitting, merging) into final communities.                                                                    |
+| `rqa.py`             | Recurrence Quantification Analysis on rainfall time series: recurrence plots, RQA metrics (DET, LAM, ENTR, L_mean), Theiler-window estimation, rolling-window RQA with IAAFT surrogate significance testing, and Mann-Kendall trend export to CSV.                                             |
+| `plots_and_stats.py` | Plotting and export utilities: styling helpers, community export to shapefile, cluster/heatmap plots, and RQA/rain diagnostic plots.                                                                                                                                                           |
 | `create_plots.ipynb` | Notebook that builds the final thesis figures (Mann-Kendall dot-plot grids, combined cluster overview grids, rank-significance-period plots) from the CSV/plot outputs that `analysis.py` already produced. Run this **after** the pipeline has completed for the presets you want to compare. |
-| `submit.sh` | SLURM job script running the pipeline for **SP / India**. |
-| `submit_EA.sh` | SLURM job script running the pipeline for **GHA**. |
-| `environment.yml` | Conda environment definition (`ghasp`). |
+| `submit.sh`          | SLURM job script running the pipeline for **SP / India**.                                                                                                                                                                                                                                      |
+| `submit_EA.sh`       | SLURM job script running the pipeline for **GHA**.                                                                                                                                                                                                                                             |
+| `environment.yml`    | Conda environment definition (`ghasp`).                                                                                                                                                                                                                                                        |
 
 ## Running the pipeline
 
@@ -62,7 +62,7 @@ logging). To run it directly, activate the environment and call `python`:
 ### India / SP
 
 Loops over both presets and only passes `--min_community_size 34` for the
-`OND_*` preset (JJAS uses the automatic Kneedle-based size):
+`OND_*` preset (JJAS uses the automatic Kneedle-based size). This is fixed to obtain the same results as in the thesis, as cluster size had varied due to minor numerical changes, as discussed in the limitations section of the thesis:
 
 ```bash
 conda activate ghasp
@@ -131,20 +131,20 @@ Other useful CLI options (see `analysis.py --help` for the full list):
 All outputs for a given run land under `<out_dir>/<preset>/`, e.g.
 `results/SP/JJAS_full/`:
 
-| Path | Produced by | Contents |
-|---|---|---|
-| `heatmap.png`, `Heatmap.csv` | `prepare` | Recurrence-fraction heatmap and its per-pixel CSV export. |
-| `*_sc_curve.svg` | `prepare` | Spectral-concentration threshold curves for sampled windows. |
-| `community_size_distribution_final.svg` | `prepare` | Community-size histogram/CCDF with the chosen `min_community_size`. |
-| `aggl_clu.png` | `plot_cluster` | Raw agglomerative clustering result. |
-| `smoothing.png` | `plot_smoothing` | Heatmap / raw clustering / smoothed clustering, side by side. |
-| `two_panel.png` | `plot_two_panel` | Final interpolated heatmap + smoothed community map. |
-| `communities.shp` (+ sidecars) | `export_communities` | Final community masks as a shapefile. |
-| `periods/` | `heatmap_periods` | Recurrence-fraction heatmap per sub-period (grid PNG, per-period SVGs and shapefiles), for checking community stability over time. |
-| `{DET,LAM,ENTR,RAIN,LMEAN,DRY_FRACTION,DRY_NODE_FRACTION}.png` | `rqa_full` | Combined plot per metric, overlaying all communities. |
-| `C{NN}_rqa_rain.png` | `plot_rqa_with_rain` | Per-community RQA + rain diagnostic panels. |
-| `rqa_rW/cluster_{NN}_{METRIC}_{preset}.csv` | `plot_metric_rolling` (via `rqa_full`) | Rolling metric series plus Mann-Kendall results, per community and metric. |
-| `rqa_rW/mk_results_{preset}.csv` | `rqa_full` | Combined Mann-Kendall trend table (all communities, all metrics, all periods) — this is the file `create_plots.ipynb` reads. |
+| Path                                                           | Produced by                            | Contents                                                                                                                           |
+| -------------------------------------------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `heatmap.png`, `Heatmap.csv`                                   | `prepare`                              | Recurrence-fraction heatmap and its per-pixel CSV export.                                                                          |
+| `*_sc_curve.svg`                                               | `prepare`                              | Spectral-concentration threshold curves for sampled windows.                                                                       |
+| `community_size_distribution_final.svg`                        | `prepare`                              | Community-size histogram/CCDF with the chosen `min_community_size`.                                                                |
+| `aggl_clu.png`                                                 | `plot_cluster`                         | Raw agglomerative clustering result.                                                                                               |
+| `smoothing.png`                                                | `plot_smoothing`                       | Heatmap / raw clustering / smoothed clustering, side by side.                                                                      |
+| `two_panel.png`                                                | `plot_two_panel`                       | Final interpolated heatmap + smoothed community map.                                                                               |
+| `communities.shp` (+ sidecars)                                 | `export_communities`                   | Final community masks as a shapefile.                                                                                              |
+| `periods/`                                                     | `heatmap_periods`                      | Recurrence-fraction heatmap per sub-period (grid PNG, per-period SVGs and shapefiles), for checking community stability over time. |
+| `{DET,LAM,ENTR,RAIN,LMEAN,DRY_FRACTION,DRY_NODE_FRACTION}.png` | `rqa_full`                             | Combined plot per metric, overlaying all communities.                                                                              |
+| `C{NN}_rqa_rain.png`                                           | `plot_rqa_with_rain`                   | Per-community RQA + rain diagnostic panels.                                                                                        |
+| `rqa_rW/cluster_{NN}_{METRIC}_{preset}.csv`                    | `plot_metric_rolling` (via `rqa_full`) | Rolling metric series plus Mann-Kendall results, per community and metric.                                                         |
+| `rqa_rW/mk_results_{preset}.csv`                               | `rqa_full`                             | Combined Mann-Kendall trend table (all communities, all metrics, all periods) — this is the file `create_plots.ipynb` reads.       |
 
 `create_plots.ipynb` reads from these `results/<region>/<preset>/` folders
 (via `base_dir` / `results_dir` arguments) and writes the final thesis
@@ -153,6 +153,5 @@ figures to whatever `out_dir` / `plot_path` you pass in its example calls
 
 ## Generating the final figures (`create_plots.ipynb`)
 
-Once `analysis.py` has finished for the presets you want to compare, run
-`create_plots.ipynb` (`conda activate ghasp && jupyter lab`) to build the
-final thesis figures from the `results/<region>/<preset>/...` outputs.
+Once `analysis.py` has finished for the presets you want to compare, see
+`create_plots.ipynb` to build the final thesis figures from the `results/<region>/<preset>/...` outputs.
